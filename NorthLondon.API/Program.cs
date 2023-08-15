@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.OpenApi.Models;
 using NorthLondon.Application;
 using NorthLondon.Infastructure;
+using NorthLondon.Infastructure.Utility;
 using Serilog;
 using Serilog.Events;
 
@@ -32,6 +33,8 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Services.Configure<AppSettings>(options => builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddScoped<IDataAccess, DataAccess>();
 builder.Services.AddScoped<IPlayerService,PlayerService>();
