@@ -53,6 +53,7 @@ namespace NorthLondon.API.Controllers
                 var result = _playerService.GetPlayerByShirtNumber(shirtNumber);
                 _response.Count = result.ShirtNumber.Count();
                 _response.StatusCode = HttpStatusCode.OK;
+                _response.Result = result;
                 return Ok(_response);
             }
             catch (Exception ex)

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace NorthLondon.Infastructure.Utility
 {
-    public class AppSettings
+    public class ConnectionStrings
     {
-        public string ConnectionStrings { get; set; }
+        public string DefaultConnections { get; set; }
     }
 }

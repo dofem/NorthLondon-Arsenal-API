@@ -9,6 +9,11 @@ using Serilog.Events;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft",LogEventLevel.Information)
     .MinimumLevel.Information()
@@ -34,10 +39,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.Configure<AppSettings>(options => builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddScoped<IDataAccess, DataAccess>();
 builder.Services.AddScoped<IPlayerService,PlayerService>();
+builder.Services.Configure<ConnectionStrings>(configuration.GetSection(nameof(ConnectionStrings)));
 
 
 var app = builder.Build();

@@ -60,6 +60,11 @@ namespace NorthLondon.Application
         public PlayerInfo GetPlayerByShirtNumber(string shirtId)
         {
             var player = _context.GetPlayerByShirtNumber(shirtId); 
+            if(player.ShirtNumber == null) 
+            {
+                _logger.LogWarning("Player with the given shirt number doesnt exists.");
+                throw new PlayerDoesntExistException(shirtId);
+            }
             return player;
         }
 

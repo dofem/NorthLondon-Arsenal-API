@@ -1,4 +1,6 @@
-﻿using NorthLondon.Domain;
+﻿using Microsoft.Extensions.Options;
+using NorthLondon.Domain;
+using NorthLondon.Infastructure.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -10,12 +12,18 @@ namespace NorthLondon.Infastructure
 {
     public class DataAccess : IDataAccess
     {
+        private readonly ConnectionStrings _options;
+
+        public DataAccess(IOptions<ConnectionStrings> options)
+        {
+            _options = options.Value;
+        }
         public void AddPlayer(PlayerInfo playerInfo)
         {
             var query = @"INSERT INTO PLAYERS (Name, ShirtNumber, Position, Nationality, JoinDate)
                   VALUES (@Name, @ShirtNumber, @Position, @Nationality, @JoinDate)";
 
-            using SqlConnection sqlConnection = new SqlConnection();
+            using SqlConnection sqlConnection = new SqlConnection(_options.DefaultConnections);
             sqlConnection.Open();
             using SqlCommand cmd = new SqlCommand(query, sqlConnection);
             cmd.Parameters.AddWithValue("@Name", playerInfo.Name);
@@ -30,7 +38,7 @@ namespace NorthLondon.Infastructure
         {
             PlayerInfo playerInfo = new PlayerInfo();
             var query = @"DELETE FROM PLAYERS WHERE ShirtNumber = @shirtNumber";
-            using SqlConnection sqlConnection = new SqlConnection();
+            using SqlConnection sqlConnection = new SqlConnection(_options.DefaultConnections);
             sqlConnection.Open();
             using SqlCommand cmd = new SqlCommand(query, sqlConnection);
             cmd.Parameters.AddWithValue("@shirtNumber", ShirtNumber);
@@ -41,7 +49,7 @@ namespace NorthLondon.Infastructure
         {
             List<PlayerInfo> playerInfos = new List<PlayerInfo>();
             var query = @"SELECT * FROM PLAYERS WHERE Nationality = @nationality";
-            using SqlConnection sqlConnection = new SqlConnection();
+            using SqlConnection sqlConnection = new SqlConnection(_options.DefaultConnections);
             sqlConnection.Open();
             using SqlCommand cmd = new SqlCommand(query, sqlConnection);
             cmd.Parameters.AddWithValue("@nationality", nationality);
@@ -66,7 +74,7 @@ namespace NorthLondon.Infastructure
         {
             PlayerInfo playerInfo = new PlayerInfo();
             var query = @"SELECT * FROM PLAYERS WHERE ShirtNumber = @shirtId";
-            using SqlConnection sqlConnection = new SqlConnection();
+            using SqlConnection sqlConnection = new SqlConnection(_options.DefaultConnections);
             sqlConnection.Open();
             using SqlCommand cmd = new SqlCommand(query, sqlConnection);
             cmd.Parameters.AddWithValue("@shirtId", shirtId);
@@ -79,6 +87,7 @@ namespace NorthLondon.Infastructure
                 playerInfo.Position = reader["Position"].ToString();
                 playerInfo.Nationality = reader["Nationality"].ToString();
                 playerInfo.JoinDate = Convert.ToDateTime(reader["DateJoined"]);
+                playerInfo.PreferredFoot = reader["PreferredFoot"].ToString();
             }
             reader.Close();
             return playerInfo;
@@ -89,7 +98,7 @@ namespace NorthLondon.Infastructure
         public List<PlayerInfo> GetTotalSquad()
         {
             List<PlayerInfo> playerInfo = new List<PlayerInfo>();
-            using SqlConnection connection = new SqlConnection();
+            using SqlConnection connection = new SqlConnection(_options.DefaultConnections);
             connection.Open();
             var query = @"SELECT * FROM PLAYERS";
             using SqlCommand command = new SqlCommand(query, connection);
@@ -103,8 +112,9 @@ namespace NorthLondon.Infastructure
                     ShirtNumber = reader["ShirtNumber"].ToString(),
                     JoinDate = Convert.ToDateTime(reader["DateJoined"]),
                     PreferredFoot = reader["PreferredFoot"].ToString(),
-                    Position = reader["Position"].ToString()
-                };
+                    Position = reader["Position"].ToString(),
+                    Nationality = reader["Nationality"].ToString()
+            };
                 playerInfo.Add(player);
             }
             reader.Close();
@@ -116,7 +126,7 @@ namespace NorthLondon.Infastructure
         {
             var query = @"UPDATE PLAYERS SET Name = @Name,ShirtNumber = @ShirtNumber,Position = @Position,
                           Nationality = @Nationality,JoinDate = @JoinDate WHERE PlayerID = @PlayerID";
-            using SqlConnection sqlConnection = new SqlConnection();
+            using SqlConnection sqlConnection = new SqlConnection(_options.DefaultConnections);
             sqlConnection.Open();
             using SqlCommand cmd = new SqlCommand(query, sqlConnection);
             cmd.Parameters.AddWithValue("@Name", playerInfo.Name);

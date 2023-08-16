@@ -10,7 +10,7 @@ namespace NorthLondon.Domain
     public class ApiResponse
     {
         public HttpStatusCode StatusCode { get; set; }
-        public bool IsSuccess { get; set; }
+        public bool IsSuccess { get; set; } = true;
         public List<string>? ErrorMessages { get; set; }
         public int Count { get; set; } = 0;
         public object? Result { get; set; }
